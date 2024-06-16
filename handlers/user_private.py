@@ -1,11 +1,15 @@
 from aiogram import F, types, Router
 from aiogram.enums import ParseMode
 from aiogram.filters import CommandStart, Command, or_f
-from aiogram.utils.formatting import as_list, as_marked_section, Bold
+from aiogram.utils.formatting import (
+    as_list,
+    as_marked_section,
+    Bold,
+)  # Italic, as_numbered_list и тд
 
 from filters.chat_types import ChatTypeFilter
 
-from kbds import reply
+from kbds.reply import get_keyboard
 
 user_private_router = Router()
 user_private_router.message.filter(ChatTypeFilter(["private"]))
@@ -15,8 +19,13 @@ user_private_router.message.filter(ChatTypeFilter(["private"]))
 async def start_cmd(message: types.Message):
     await message.answer(
         "Привет, я виртуальный помощник",
-        reply_markup=reply.start_kb3.as_markup(
-            resize_keyboard=True, input_field_placeholder="Что вас интересует?"
+        reply_markup=get_keyboard(
+            "Меню",
+            "О магазине",
+            "Варианты оплаты",
+            "Варианты доставки",
+            placeholder="Что вас интересует?",
+            sizes=(2, 2)
         ),
     )
 
@@ -27,7 +36,7 @@ async def menu_cmd(message: types.Message):
     await message.answer("Вот меню:")
 
 
-@user_private_router.message(F.text.lower() == "о магазине")
+@user_private_router.message(F.text.lower() == "о нас")
 @user_private_router.message(Command("about"))
 async def about_cmd(message: types.Message):
     await message.answer("О нас:")
@@ -37,12 +46,12 @@ async def about_cmd(message: types.Message):
 @user_private_router.message(Command("payment"))
 async def payment_cmd(message: types.Message):
     text = as_marked_section(
-            Bold("Варианты оплаты:"),
-            "Картой в боте",
-            "При получении карта/кеш",
-            "В заведении",
-            marker='✅ '
-        )
+        Bold("Варианты оплаты:"),
+        "Картой в боте",
+        "При получении карта/кеш",
+        "В заведении",
+        marker="✅ ",
+    )
     await message.answer(text.as_html())
 
 
@@ -54,17 +63,17 @@ async def menu_cmd(message: types.Message):
         as_marked_section(
             Bold("Варианты доставки/заказа:"),
             "Курьер",
-            "Самовывоз (сейчас прибегу заберу)",
-            "Покушаюу у Вас (сейчас прибегу)",
-            marker='✅ '
+            "Самовынос (сейчас прибегу заберу)",
+            "Покушаю у Вас (сейчас прибегу)",
+            marker="✅ ",
         ),
         as_marked_section(
             Bold("Нельзя:"),
             "Почта",
             "Голуби",
-            marker='❌ '
+            marker="❌ "
         ),
-        sep='\n-----------------------\n'
+        sep="\n----------------------\n",
     )
     await message.answer(text.as_html())
 

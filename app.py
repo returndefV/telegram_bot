@@ -39,7 +39,6 @@ async def on_startup(bot):
 
     await create_db()
 
-
 async def on_shutdown(bot):
     print('бот лег')
 
